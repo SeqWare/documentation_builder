@@ -4,6 +4,8 @@ Assumes that seqware\_whitestar has already been built.
 
 ---------------------------------------------------------------
 
+For developers
+
 1. Add an appropriate private key at private\_key.pem
 
 2. Assuming docker is installed properly, build image with 
