@@ -1,6 +1,6 @@
 # Build our documentation and push it to github 
 
-FROM seqware_1.1.0-alpha.6
+FROM seqware/seqware_whitestar
 MAINTAINER Denis Yuen <denis.yuen@oicr.on.ca>
 
 USER seqware
