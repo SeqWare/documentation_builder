@@ -46,3 +46,6 @@ RUN sudo chown -R seqware /home/seqware/.m2/settings.xml
 RUN git clone -b develop https://github.com/SeqWare/seqware.git 
 WORKDIR /home/seqware/seqware
 RUN mvn clean install -DskipTests 
+
+# current gem version seems to fix the incompatibility
+RUN sudo gem install yajl-ruby
