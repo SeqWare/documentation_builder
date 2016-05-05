@@ -1,18 +1,33 @@
 # Build our documentation and push it to github 
 
-FROM seqware/seqware_whitestar
+FROM ubuntu:14.04 
 MAINTAINER Denis Yuen <denis.yuen@oicr.on.ca>
 
-USER seqware
-WORKDIR /home/seqware
+WORKDIR /root
 
-ADD config /home/seqware/.ssh/config
-ADD private_key.pem /home/seqware/.ssh/id_rsa
-RUN sudo chown -R seqware /home/seqware/.ssh ;\
-    sudo chmod -R 600 /home/seqware/.ssh/* ;\
+ADD config /root/.ssh/config
+ADD private_key.pem /root/.ssh/id_rsa
+RUN sudo apt-get update ; \
+    sudo apt-get -y install ssh software-properties-common ;
+RUN sudo chown -R root /root/.ssh ;\
+    sudo chmod -R 600 /root/.ssh/* ;\
     eval "$(ssh-agent -s)" ;\
     ssh-add ~/.ssh/id_rsa ;\
-    sudo apt-get -y install ruby1.9.3 ruby-rvm ruby-rdiscount ruby-nokogiri ;
+    sudo apt-add-repository -y ppa:rael-gc/rvm ;\
+    sudo apt-get update ; \
+    sudo apt-get -y install rvm git maven ruby1.9.3 ruby-rdiscount ruby-nokogiri ;
+
+# install java 8
+RUN \
+  echo oracle-java8-installer shared/accepted-oracle-license-v1-1 select true | debconf-set-selections && \
+  add-apt-repository -y ppa:webupd8team/java && \
+  apt-get update && \
+  apt-get install -y oracle-java8-installer && \
+  rm -rf /var/lib/apt/lists/* && \
+  rm -rf /var/cache/oracle-jdk8-installer
+
+# # Define commonly used JAVA_HOME variable
+ENV JAVA_HOME /usr/lib/jvm/java-8-oracle
 
 # enforce US locale, seems to better agree with gems
 USER root
@@ -29,7 +44,6 @@ RUN     sudo locale-gen en_US.UTF-8 ;\
 	echo 'LC_ALL="en_US.UTF-8"' | sudo tee -a /etc/environment ;\
 	echo 'LC_CTYPE="en_US.UTF-8"' | sudo tee -a /etc/environment
 
-USER seqware
 RUN     export LANGUAGE=en_US.UTF-8;\
         export LANG=en_US.UTF-8 ;\
 	export LC_ALL=en_US.UTF-8 ;\
@@ -41,11 +55,8 @@ RUN     export LANGUAGE=en_US.UTF-8;\
 RUN git config --global user.name "Seqware jenkins" ;\
     git config --global user.email seqware-jenkins@oicr.on.ca 
 
-ADD settings.xml  /home/seqware/.m2/settings.xml
-RUN sudo chown -R seqware /home/seqware/.m2/settings.xml
+ADD settings.xml  /root/.m2/settings.xml
 RUN git clone -b develop https://github.com/SeqWare/seqware.git 
-WORKDIR /home/seqware/seqware
-RUN mvn clean install -DskipTests 
-
+WORKDIR /root/seqware 
 # current gem version seems to fix the incompatibility
 RUN sudo gem install yajl-ruby
