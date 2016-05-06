@@ -1,7 +1,5 @@
 This creates and updates documentation at seqware.github.com 
 
-Assumes that seqware\_whitestar has already been built. 
-
 ---------------------------------------------------------------
 
 For developers:
