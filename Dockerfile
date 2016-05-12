@@ -15,7 +15,7 @@ RUN sudo chown -R root /root/.ssh ;\
     ssh-add ~/.ssh/id_rsa ;\
     sudo apt-add-repository -y ppa:rael-gc/rvm ;\
     sudo apt-get update ; \
-    sudo apt-get -y install rvm git maven ruby1.9.3 ruby-rdiscount ruby-nokogiri ;
+    sudo apt-get -y install rvm git ruby1.9.3 ruby-rdiscount ruby-nokogiri ;
 
 # install java 8
 RUN \
@@ -26,8 +26,18 @@ RUN \
   rm -rf /var/lib/apt/lists/* && \
   rm -rf /var/cache/oracle-jdk8-installer
 
-# # Define commonly used JAVA_HOME variable
+# Define commonly used JAVA_HOME variable
 ENV JAVA_HOME /usr/lib/jvm/java-8-oracle
+
+# install Maven 3.3.9
+ENV MAVEN_VERSION 3.3.9
+
+RUN mkdir -p /usr/share/maven \
+  && curl -fsSL http://apache.osuosl.org/maven/maven-3/$MAVEN_VERSION/binaries/apache-maven-$MAVEN_VERSION-bin.tar.gz \
+    | tar -xzC /usr/share/maven --strip-components=1 \
+  && ln -s /usr/share/maven/bin/mvn /usr/bin/mvn
+
+ENV MAVEN_HOME /usr/share/maven
 
 # enforce US locale, seems to better agree with gems
 USER root
